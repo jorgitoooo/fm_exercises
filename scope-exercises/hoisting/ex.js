@@ -1,66 +1,80 @@
+/*
+Refactor all inline function expressions to be function declarations. Place function declarations at the bottom (that is, below any executable code) of their respective scopes.
+
+Also, pull function declarations to outer scopes if they don't need to be nested.
+*/
 function getStudentFromId(studentId) {
-	return studentRecords.find(function matchId(record){
-		return (record.id == studentId);
-	});
+  return studentRecords.find(matchId);
+
+  function matchId(record) {
+    return record.id == studentId;
+  }
 }
 
 function printRecords(recordIds) {
-	var records = recordIds.map(getStudentFromId);
+  var records = recordIds.map(getStudentFromId);
 
-	records.sort(function sortByNameAsc(record1,record2){
-		if (record1.name < record2.name) return -1;
-		else if (record1.name > record2.name) return 1;
-		else return 0;
-	});
+  records.sort(sortByNameAsc);
 
-	records.forEach(function printRecord(record){
-		console.log(`${record.name} (${record.id}): ${record.paid ? "Paid" : "Not Paid"}`);
-	});
+  records.forEach(printRecord);
 }
 
 function paidStudentsToEnroll() {
-	var recordsToEnroll = studentRecords.filter(function needToEnroll(record){
-		return (record.paid && !currentEnrollment.includes(record.id));
-	});
+  var recordsToEnroll = studentRecords.filter(needToEnroll);
 
-	var idsToEnroll = recordsToEnroll.map(function getStudentId(record){
-		return record.id;
-	});
+  var idsToEnroll = recordsToEnroll.map(getStudentId);
 
-	return [ ...currentEnrollment, ...idsToEnroll ];
+  return [...currentEnrollment, ...idsToEnroll];
 }
 
 function remindUnpaid(recordIds) {
-	var unpaidIds = recordIds.filter(function notYetPaid(studentId){
-		var record = getStudentFromId(studentId);
-		return !record.paid;
-	});
+  var unpaidIds = recordIds.filter(notYetPaid);
 
-	printRecords(unpaidIds);
+  printRecords(unpaidIds);
 }
 
-
+// ********************************
+function sortByNameAsc(record1, record2) {
+  if (record1.name < record2.name) return -1;
+  else if (record1.name > record2.name) return 1;
+  else return 0;
+}
+function printRecord(record) {
+  console.log(
+    `${record.name} (${record.id}): ${record.paid ? 'Paid' : 'Not Paid'}`
+  );
+}
+function needToEnroll(record) {
+  return record.paid && !currentEnrollment.includes(record.id);
+}
+function getStudentId(record) {
+  return record.id;
+}
+function notYetPaid(studentId) {
+  var record = getStudentFromId(studentId);
+  return !record.paid;
+}
 // ********************************
 
-var currentEnrollment = [ 410, 105, 664, 375 ];
+var currentEnrollment = [410, 105, 664, 375];
 
 var studentRecords = [
-	{ id: 313, name: "Frank", paid: true, },
-	{ id: 410, name: "Suzy", paid: true, },
-	{ id: 709, name: "Brian", paid: false, },
-	{ id: 105, name: "Henry", paid: false, },
-	{ id: 502, name: "Mary", paid: true, },
-	{ id: 664, name: "Bob", paid: false, },
-	{ id: 250, name: "Peter", paid: true, },
-	{ id: 375, name: "Sarah", paid: true, },
-	{ id: 867, name: "Greg", paid: false, },
+  { id: 313, name: 'Frank', paid: true },
+  { id: 410, name: 'Suzy', paid: true },
+  { id: 709, name: 'Brian', paid: false },
+  { id: 105, name: 'Henry', paid: false },
+  { id: 502, name: 'Mary', paid: true },
+  { id: 664, name: 'Bob', paid: false },
+  { id: 250, name: 'Peter', paid: true },
+  { id: 375, name: 'Sarah', paid: true },
+  { id: 867, name: 'Greg', paid: false }
 ];
 
 printRecords(currentEnrollment);
-console.log("----");
+console.log('----');
 currentEnrollment = paidStudentsToEnroll();
 printRecords(currentEnrollment);
-console.log("----");
+console.log('----');
 remindUnpaid(currentEnrollment);
 
 /*
